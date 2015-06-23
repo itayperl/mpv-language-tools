@@ -10,7 +10,7 @@ Makes the subtitle delay parameter separate for each subtitle track. Useful when
 
 Maps Shift-K to open the currently displayed subtitle in [Jisho](http://jisho.org).
 
-Assumes `sensible-browser` is in PATH.
+Supports only external ASS and SRT subtitles. Assumes `sensible-browser` is in PATH.
 
 ### record.lua
 
