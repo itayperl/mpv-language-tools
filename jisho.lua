@@ -1,11 +1,44 @@
 require('ass')
 
-subtitles = {}
+-------------
+-- helpers --
+-------------
+
+function trim(s)
+  return s:match'^%s*(.*%S)' or ''
+end
+
+function shell_escape(...)
+ local command = type(...) == 'table' and ... or { ... }
+ for i, s in ipairs(command) do
+  s = (tostring(s) or ''):gsub('"', '\\"')
+  if s:find '[^A-Za-z0-9_."/-]' then
+   s = '"' .. s .. '"'
+  elseif s == '' then
+   s = '""'
+  end
+  command[i] = s
+ end
+ return table.concat(command, ' ')
+end
+
+function urlencode(str)
+   if (str) then
+      str = string.gsub (str, "\n", "\r\n")
+      str = string.gsub (str, "([^%w])",
+         function (c) return string.format ("%%%02X", string.byte(c)) end)
+   end
+   return str    
+end
 
 function parse_timestamp(t)
     local h, m, s, ms = t:match("(%d+):(%d+):(%d+),(%d+)")
     return ms + s * 1000 + m * 60*1000 + h * 60*60*1000
 end
+
+-------------
+
+subtitles = {}
 
 function load_srt(fn)
     local subfile = io.open(fn, "r")
@@ -69,7 +102,17 @@ function read_subfile(sid)
                return nil
            end
 
+           -- trim subtitles and remove empty lines
+           for i=#subtitles[sid],1,-1 do
+               subtitles[sid][i].text = trim(subtitles[sid][i].text)
+               if subtitles[sid][i].text == '' then
+                   table.remove(subtitles[sid], i)
+               end
+           end
+
+           -- sort by time
            table.sort(subtitles[sid], timeSort)
+
            return subtitles[sid]
         end
     end
@@ -83,29 +126,6 @@ function sub_get_line(lines, time)
         end
         prev = line
     end
-end
-
-function shell_escape(...)
- local command = type(...) == 'table' and ... or { ... }
- for i, s in ipairs(command) do
-  s = (tostring(s) or ''):gsub('"', '\\"')
-  if s:find '[^A-Za-z0-9_."/-]' then
-   s = '"' .. s .. '"'
-  elseif s == '' then
-   s = '""'
-  end
-  command[i] = s
- end
- return table.concat(command, ' ')
-end
-
-function urlencode(str)
-   if (str) then
-      str = string.gsub (str, "\n", "\r\n")
-      str = string.gsub (str, "([^%w])",
-         function (c) return string.format ("%%%02X", string.byte(c)) end)
-   end
-   return str    
 end
 
 function open_jisho()
