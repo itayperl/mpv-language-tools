@@ -119,13 +119,17 @@ function read_subfile(sid)
 end
 
 function sub_get_line(lines, time)
-    prev = nil
+    combined = ''
     for id, line in ipairs(lines) do 
-        if line.start_time > time*1000 and prev ~= nil then
-            return prev.text
+        if line.start_time < time*1000 and time*1000 < line.end_time then
+            if combined ~= '' then
+                combined = combined .. ' '
+            end
+            combined = combined .. line.text
         end
-        prev = line
     end
+
+    return combined
 end
 
 function open_jisho()
