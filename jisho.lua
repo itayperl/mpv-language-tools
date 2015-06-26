@@ -145,7 +145,6 @@ function open_jisho()
         return
     end
 
-    mp.set_property_bool('pause', true)
     time = mp.get_property_number("time-pos")
     delay = mp.get_property_number("sub-delay")
     cur_line = sub_get_line(lines, time - delay)
@@ -154,6 +153,7 @@ function open_jisho()
         return
     end
 
+    mp.set_property_bool('pause', true)
     os.execute(shell_escape("sensible-browser", string.format("http://jisho.org/search/%s", urlencode(cur_line))))
 end
 mp.add_key_binding("K", "Jisho", open_jisho)
