@@ -17,14 +17,14 @@ end
 
 start_time = 0
 function start_capture()
-    start_time = mp.get_property_number("time-pos")
+    start_time = mp.get_property_number("time-pos") - 0.1
 end
 
 function stop_capture()
-    local duration = mp.get_property_number('time-pos') - start_time + 2
+    local duration = mp.get_property_number('time-pos') - start_time + 0.1
     local path = mp.get_property('path')
     local fn = gen_filename()
-    local encoder = io.popen(string.format('avconv -i "%s" -map 0:1 -ab 64k -ss %d -t %d "%s" &', path, start_time, duration, fn))
+    local encoder = io.popen(string.format('avconv -i "%s" -map 0:1 -ab 64k -ss %.3f -t %.3f "%s" &', path, start_time, duration, fn))
     encoder:close()
 end
 
