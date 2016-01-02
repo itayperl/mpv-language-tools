@@ -24,7 +24,17 @@ function stop_capture()
     local duration = mp.get_property_number('time-pos') - start_time + 0.1
     local path = mp.get_property('path')
     local fn = gen_filename()
-    local encoder = io.popen(string.format('avconv -i "%s" -map 0:1 -ab 64k -ss %.3f -t %.3f "%s" &', path, start_time, duration, fn))
+
+    local which = io.popen('which ffmpeg avconv')
+    local exec = which:lines()()
+    which:close()
+    
+    if exec == nil then
+        print('cannot find avconv or ffmpeg in PATH')
+        return
+    end
+
+    local encoder = io.popen(string.format('%s -i "%s" -map 0:1 -ab 64k -ss %.3f -t %.3f "%s" &', exec, path, start_time, duration, fn))
     encoder:close()
 end
 
